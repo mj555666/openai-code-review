@@ -1,4 +1,4 @@
-package cn.bugstack.sdk;
+package plus.gaga.sdk;
 
 public class OpenAiCodeReview {
     public static void main(String[] args) {

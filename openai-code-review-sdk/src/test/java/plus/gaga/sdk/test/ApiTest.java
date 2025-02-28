@@ -1,4 +1,4 @@
-package cn.bugstack.sdk.test;
+package plus.gaga.sdk.test;
 
 public class ApiTest {
 
