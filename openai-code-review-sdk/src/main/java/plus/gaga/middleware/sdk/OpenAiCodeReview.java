@@ -20,6 +20,7 @@ import java.util.Random;
 public class OpenAiCodeReview {
 
     public static void main(String[] args) throws Exception {
+        System.out.println("openai 代码评审，测试执行");
 
         String token = System.getenv("GITHUB_TOKEN");
         if (null == token || token.isEmpty()) {
