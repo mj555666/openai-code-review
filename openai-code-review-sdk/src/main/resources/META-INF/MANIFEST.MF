@@ -1,2 +1,2 @@
-Mainfest-Version: 1.0
-Main-Class: plus.gaga.sdk.OpenAiCodeReview
+Manifest-Version: 1.0
+Main-Class: plus.gaga.middleware.sdk.OpenAiCodeReview

@@ -1,4 +1,4 @@
-package plus.gaga.sdk.test;
+package plus.gaga.middleware.sdk.test;
 
 public class ApiTest {
 
