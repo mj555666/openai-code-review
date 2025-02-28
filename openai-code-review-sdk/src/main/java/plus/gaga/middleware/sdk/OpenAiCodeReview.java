@@ -20,7 +20,11 @@ import java.util.Random;
 public class OpenAiCodeReview {
 
     public static void main(String[] args) throws Exception {
-        System.out.println("测试执行");
+
+        String token = System.getenv("GITHUB_TOKEN");
+        if (null == token || token.isEmpty()) {
+            throw new RuntimeException("token is null");
+        }
 
         // 1. 代码检出
         ProcessBuilder processBuilder = new ProcessBuilder("git", "diff", "HEAD~1", "HEAD");
@@ -44,6 +48,10 @@ public class OpenAiCodeReview {
         // 2. chatglm 代码评审
         String log = codeReview(diffCode.toString());
         System.out.println("code review：" + log);
+
+        // 3. 写入评审日志
+        String logUrl = writeLog(token, log);
+        System.out.println("writeLog：" + logUrl);
     }
 
     private static String codeReview(String diffCode) throws Exception {
