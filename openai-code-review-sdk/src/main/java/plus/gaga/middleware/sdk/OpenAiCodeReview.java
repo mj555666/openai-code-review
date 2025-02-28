@@ -1,8 +1,16 @@
 package plus.gaga.middleware.sdk;
 
+import com.alibaba.fastjson2.JSON;
+import plus.gaga.middleware.sdk.domain.model.ChatCompletionSyncResponse;
+import plus.gaga.middleware.sdk.types.utils.BearerTokenUtils;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 
 public class OpenAiCodeReview {
 
@@ -10,15 +18,11 @@ public class OpenAiCodeReview {
         System.out.println("测试执行");
 
         // 1. 代码检出
-        //这里创建的ProcessBuilder对象，用于执行Git命令，这个命令是git diff HEAD~1 HEAD，他将比较当前提交和上一个提交之间的代码差异
         ProcessBuilder processBuilder = new ProcessBuilder("git", "diff", "HEAD~1", "HEAD");
-        //这里是设置执行目录，.表示当前目录
         processBuilder.directory(new File("."));
 
-        //使用processBuilder启动命令，并返回一个Process对象
         Process process = processBuilder.start();
 
-        //这里创建一个BufferedReader来读取命令执行的标准输出流。每次读取一行数据，将其添加到diffCode字符串构建器中。最终 diffCode 会包含 Git diff 输出的所有内容，即代码差异。
         BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
         String line;
 
@@ -27,11 +31,64 @@ public class OpenAiCodeReview {
             diffCode.append(line);
         }
 
-        //等待Git命令执行完毕，获取进程的退出码，0表示执行成功，否则表示发生错误
         int exitCode = process.waitFor();
         System.out.println("Exited with code:" + exitCode);
 
-        System.out.println("评审代码：" + diffCode.toString());
+        System.out.println("diff code：" + diffCode.toString());
+
+        // 2. chatglm 代码评审
+        String log = codeReview(diffCode.toString());
+        System.out.println("code review：" + log);
     }
+
+    private static String codeReview(String diffCode) throws Exception {
+        String apiKeySecret = "8d82aa1dc93d43d4a9d044a45161b7de.oZ9t8jIJp48VbykD";
+        String token = BearerTokenUtils.getToken(apiKeySecret);
+
+        URL url = new URL("https://open.bigmodel.cn/api/paas/v4/chat/completions");
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+        connection.setRequestMethod("POST");
+        connection.setRequestProperty("Authorization", "Bearer " + token);
+        connection.setRequestProperty("Content-Type", "application/json");
+        connection.setRequestProperty("User-Agent", "Mozilla/4.0 (compatible; MSIE 5.0; Windows NT; DigExt)");
+        connection.setDoOutput(true);
+
+        String code = "1+1";
+
+        String jsonInpuString = "{"
+                + "\"model\":\"glm-4-flash\","
+                + "\"messages\": ["
+                + "    {"
+                + "        \"role\": \"user\","
+                + "        \"content\": \"你是一个高级编程架构师，精通各类场景方案、架构设计和编程语言请，请您根据git diff记录，对代码做出评审。代码为: " + code + "\""
+                + "    }"
+                + "]"
+                + "}";
+
+
+        try (OutputStream os = connection.getOutputStream()) {
+            byte[] input = jsonInpuString.getBytes(StandardCharsets.UTF_8);
+            os.write(input);
+        }
+
+        int responseCode = connection.getResponseCode();
+        System.out.println(responseCode);
+
+        BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+        String inputLine;
+
+        StringBuilder content = new StringBuilder();
+        while ((inputLine = in.readLine()) != null) {
+            content.append(inputLine);
+        }
+
+        in.close();
+        connection.disconnect();
+
+        ChatCompletionSyncResponse response = JSON.parseObject(content.toString(), ChatCompletionSyncResponse.class);
+        return response.getChoices().get(0).getMessage().getContent();
+    }
+
 
 }
