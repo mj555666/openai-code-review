@@ -107,7 +107,7 @@ public class OpenAiCodeReview {
 
     private static String writeLog(String token, String log) throws Exception {
         Git git = Git.cloneRepository()
-                .setURI("\"https://github.com/mj555666/openai-code-review-new")
+                .setURI("https://github.com/mj555666/openai-code-review-new.git")
                 .setDirectory(new File("repo"))
                 .setCredentialsProvider(new UsernamePasswordCredentialsProvider(token, ""))
                 .call();
