@@ -2,7 +2,7 @@ package plus.gaga.middleware.sdk.test;
 
 import com.alibaba.fastjson2.JSON;
 import org.junit.Test;
-import plus.gaga.middleware.sdk.domain.model.ChatCompletionSyncResponse;
+import plus.gaga.middleware.sdk.infrastructure.openai.dto.ChatCompletionSyncResponseDTO;
 import plus.gaga.middleware.sdk.types.utils.BearerTokenUtils;
 import plus.gaga.middleware.sdk.types.utils.WXAccessTokenUtils;
 
@@ -51,7 +51,7 @@ public class ApiTest {
                 + "}";
 
 
-        try(OutputStream os = connection.getOutputStream()){
+        try (OutputStream os = connection.getOutputStream()) {
             byte[] input = jsonInpuString.getBytes(StandardCharsets.UTF_8);
             os.write(input);
         }
@@ -63,14 +63,14 @@ public class ApiTest {
         String inputLine;
 
         StringBuilder content = new StringBuilder();
-        while ((inputLine = in.readLine()) != null){
+        while ((inputLine = in.readLine()) != null) {
             content.append(inputLine);
         }
 
         in.close();
         connection.disconnect();
 
-        ChatCompletionSyncResponse response = JSON.parseObject(content.toString(), ChatCompletionSyncResponse.class);
+        ChatCompletionSyncResponseDTO response = JSON.parseObject(content.toString(), ChatCompletionSyncResponseDTO.class);
         System.out.println(response.getChoices().get(0).getMessage().getContent());
 
     }
