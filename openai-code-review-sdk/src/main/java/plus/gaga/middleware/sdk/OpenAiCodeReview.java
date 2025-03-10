@@ -36,8 +36,8 @@ public class OpenAiCodeReview {
                 getEnv("GITHUB_REVIEW_LOG_URI"),
                 getEnv("GITHUB_TOKEN"),
                 getEnv("COMMIT_PROJECT"),
-                getEnv("COMMIT_BRANCH"),
                 getEnv("COMMIT_AUTHOR"),
+                getEnv("COMMIT_BRANCH"),
                 getEnv("COMMIT_MESSAGE")
         );
 
