@@ -23,6 +23,8 @@ public abstract class AbstractOpenAiCodeReviewService implements IOpenAiCodeRevi
         this.weiXin = weiXin;
     }
 
+
+
     @Override
     public void exec() {
         try {
